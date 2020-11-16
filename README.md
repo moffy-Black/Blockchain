@@ -1,5 +1,6 @@
-# essaySchedule
+# Learn Blockchains
+
+from url:https://hackernoon.com/learn-blockchains-by-building-one-117428612f46
 
 ### purpose
-myjlab11thの学生が空いた時間に論文を読み合うことを可能にする。
-スケジュールを合わせるためのアプリ。
+myjlab11th テックプレゼン
