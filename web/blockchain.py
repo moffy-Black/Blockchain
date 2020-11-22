@@ -13,6 +13,8 @@ class Blockchain(object):
     #ジェネシスブロック(一番初めのブロック)の生成。
     self.new_block(previous_hash=1, proof=100)
 
+    self.nodes = set()
+
   def new_block(self, proof, previous_hash=None):
 
     # """
@@ -100,4 +102,3 @@ class Blockchain(object):
     guess_hash = hashlib.sha256(guess).hexdigest()
 
     return guess_hash[:4] == "0000"
-  
