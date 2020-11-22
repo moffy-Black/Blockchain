@@ -1,2 +1,5 @@
-.lock
+__pycache__
+*db
+.venv
+Pipfile.lock
 .DS_Store
