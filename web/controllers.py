@@ -54,3 +54,37 @@ class ChainController:
       'length': len(blockchain.chain),
     }
     resp.media = response
+
+class RegisterController:
+  async def on_post(self, req, resp):
+    data = await req.media()
+    nodes = data.get('nodes')
+    if nodes is None:
+      resp.status_code = 400
+    
+    for node in nodes:
+      blockchain.register_node(node)
+    
+    response = {
+      'message': '新しいノードが追加されました',
+      'total_nodes': list(blockchain.nodes),
+    }
+    resp.media = response
+
+class ResolveController:
+  async def on_get(self, req, resp):
+    replaced = blockchain.resolve_conflicts() #error
+
+    if replaced:
+      response = {
+        'message': 'チェーンが置き換えられました',
+        'new_chain': blockchain.chain
+      }
+    
+    else:
+      response = {
+        'message': 'チェーンが確認されました',
+        'new_chain': blockchain.chain
+      }
+
+    resp.media = response
