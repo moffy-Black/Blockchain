@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 responder = "*"
+requests = "*"
 
 [dev-packages]
 
@@ -15,4 +16,5 @@ python_version = "3.8"
 allow_prereleases = true
 
 [scripts]
-server = "python web/app.py"
+server1 = "python web/node1.py"
+server2 = "python web/node2.py"

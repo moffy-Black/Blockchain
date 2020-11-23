@@ -2,7 +2,9 @@
 
 import hashlib
 import json
+import requests
 from time import time
+from urllib.parse import urlparse
 
 class Blockchain(object):
   def __init__(self):
@@ -102,3 +104,75 @@ class Blockchain(object):
     guess_hash = hashlib.sha256(guess).hexdigest()
 
     return guess_hash[:4] == "0000"
+
+  def register_node(self, address):
+    # """
+    # ノードリストに新しいノードを加える
+    # :param address: <str> ノードのアドレス 例: 'http://192.168.0.3:5050'
+    # :return: None
+    # """
+
+    parsed_url = urlparse(address)
+    self.nodes.add(parsed_url.netloc)
+
+  def valid_chain(self, chain):
+    # """
+    # ブロックチェーンが正しいかを確認する関数
+    # :param chain: <list> ブロックチェーン
+    # :return: <bool> Trueであれば正しく、Falseであればそうでない
+    # """
+
+    last_block = chain[0]
+    current_index = 1
+
+    while current_index < len(chain):
+      block = chain[current_index]
+      print(f'{last_block}')
+      print(f'{block}')
+      print(f"\n--------------\n")
+
+      #ブロックのハッシュが正しいか確認
+      if block['previous_hash'] != self.hash(last_block):
+        return False
+
+      #ブロックのハッシュが正しいかを確認
+      if not self.valid_proof(last_block['proof'], block['proof']):
+        return False
+
+      last_block = block
+      current_index += 1
+
+    return True
+  
+  def resolve_conflicts(self):
+    # """
+    # コンセンサスのアルゴリズム。ネットワーク上の最も長いチェーンが、
+    # 自らのチェーンを置き換えることでコンフリクトを解消する。
+    # :return: <bool> 自らのチェーンが置き換えられるTrue、られないFlase
+    # """
+
+    neighbours = self.nodes
+    new_chain = None
+
+    # 自らのチェーンより長いチェーンを探す必要がある
+    max_length = len(self.chain)
+
+    # 他のすべてのノードのチェーンを確認
+    for node in neighbours:
+      response = requests.get(f'http://{node}/chain') #error
+
+      if response.status_code == 200:
+        length = response.json()['length']
+        chain = response.json()['chain']
+
+        # そのチェーンがより長いか、有効かを確認
+        if length > max_length and self.valid_chain(chain):
+          max_length = length
+          new_chain = chain
+
+    # もし自らのチェーンより長く、かつ有効なチェーンを見つけた場合それで置き換える
+    if new_chain:
+      self.chain = new_chain
+      return True
+
+    return False
